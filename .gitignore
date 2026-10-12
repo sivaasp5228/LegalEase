@@ -1,0 +1,53 @@
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Generated Documents & User Exports
+generated_docs/
+exports/
+*.docx
+*.pdf
+*.txt
+!requirements.txt
+!README.md
+!1. Brainstorming & Ideation/*.md
+!2. Requirement Analysis/*.md
+!3. Project Design Phase/*.md
+!4. Project Planning Phase/*.md
+!5. Project Development Phase/*.md
+!6. Project Testing/*.md
+!7. Project Documentation/*.md
+!8. Project Demonstration/*.md
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs & Temporary Files
+*.log
+tmp/
+temp/

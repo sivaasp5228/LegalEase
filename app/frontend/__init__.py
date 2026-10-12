@@ -1,0 +1,1 @@
+"""LegalEase frontend application package."""
