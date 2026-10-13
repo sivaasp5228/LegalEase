@@ -22,7 +22,7 @@ class GeminiDocumentGenerator:
             self.api_key = api_key.strip()
         else:
             self.api_key = os.getenv("GEMINI_API_KEY")
-        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
         self._model = None
 
     def _ensure_client(self):
@@ -83,17 +83,21 @@ class GeminiDocumentGenerator:
                 "temperature": 0.2,
                 "top_p": 0.95,
             }
+            request_options = {
+                "timeout": 45,
+            }
             try:
                 response = self._model.generate_content(
                     prompt,
                     generation_config=generation_config,
+                    request_options=request_options,
                 )
             except Exception as model_err:
                 err_msg = str(model_err).lower()
                 # If model is deprecated or exceeded specific model quota, try fallback models
-                if any(x in err_msg for x in ["not found", "no longer available", "quota", "429", "resourceexhausted"]):
+                if any(x in err_msg for x in ["not found", "no longer available", "quota", "429", "resourceexhausted", "deadline", "timed out"]):
                     import google.generativeai as genai
-                    fallback_models = ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.7-flash"]
+                    fallback_models = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.7-flash"]
                     response = None
                     last_err = model_err
                     for fb_name in fallback_models:
@@ -107,19 +111,26 @@ class GeminiDocumentGenerator:
                             response = fb_model.generate_content(
                                 prompt,
                                 generation_config=generation_config,
+                                request_options=request_options,
                             )
                             if response:
+                                self.model_name = fb_name
                                 break
                         except Exception as fb_err:
                             last_err = fb_err
                             continue
                     if response is None:
+                        if "429" in str(last_err) or "resourceexhausted" in str(last_err).lower():
+                            raise RuntimeError(
+                                "Gemini API rate limit or quota exceeded (429). "
+                                "Please wait a moment, verify your Google AI Studio quota, or provide a custom API key in the sidebar."
+                            ) from last_err
                         raise last_err
                 else:
                     raise
 
             if not response:
-                raise RuntimeError("No response returned from Gemini 1.5 Pro.")
+                raise RuntimeError(f"No response returned from Gemini model ({self.model_name}).")
 
             # Validate candidate finish reason if text accessor throws
             try:

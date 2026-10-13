@@ -114,7 +114,7 @@ def render_hero():
         <div class="hero-wrapper">
             <div class="hero-glow-orb"></div>
             <div class="hero-meta-badge">
-                <span style="font-size:0.65rem;">●</span> GEMINI 1.5 PRO ARCHITECTURE
+                <span style="font-size:0.65rem;">●</span> GEMINI INTELLIGENCE ARCHITECTURE
             </div>
             <h1 class="hero-title">
                 Legal documents.<br>
@@ -171,12 +171,16 @@ def render_sidebar(backend_url: str):
         # System Status & Gemini Health
         is_connected = False
         gemini_configured = False
+        display_model_name = "Gemini Flash Lite"
         try:
             r = requests.get(f"{backend_url}/health", timeout=1.5)
             if r.status_code == 200:
                 is_connected = True
                 data = r.json()
                 gemini_configured = data.get("gemini_configured", False)
+                raw_model = data.get("model_name", "")
+                if raw_model:
+                    display_model_name = raw_model.replace("models/", "").replace("-", " ").title()
         except Exception:
             is_connected = False
             gemini_configured = False
@@ -203,7 +207,7 @@ def render_sidebar(backend_url: str):
                 </div>
                 <div class="status-row">
                     <span class="status-label">AI Engine</span>
-                    <span class="status-value engine">Gemini 1.5 Pro</span>
+                    <span class="status-value engine">{display_model_name}</span>
                 </div>
                 <div class="status-row">
                     <span class="status-label">Gemini API</span>
@@ -358,7 +362,7 @@ def render_document_metadata(doc_type: str, effective_date: str, content: str):
                 <span>Words:</span> <strong>~{word_count}</strong>
             </div>
             <div class="meta-chip">
-                <span style="color:#34D399;">●</span> <strong>Gemini 1.5 Pro Synthesized</strong>
+                <span style="color:#34D399;">●</span> <strong>Gemini Synthesized</strong>
             </div>
         </div>
         """,
@@ -386,7 +390,7 @@ def render_generating_indicator():
                     <span class="step-dot"></span> Structuring clauses
                 </div>
                 <div class="generating-step-item">
-                    <span class="step-dot"></span> Gemini 1.5 Pro synthesis
+                    <span class="step-dot"></span> Gemini synthesis
                 </div>
                 <div class="generating-step-item">
                     <span class="step-dot"></span> Formatting document

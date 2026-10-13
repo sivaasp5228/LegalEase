@@ -57,11 +57,13 @@ def health():
     """Health check endpoint for liveness and monitoring."""
     load_dotenv(dotenv_path=ENV_FILE, override=True)
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    model_name = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
     gemini_configured = bool(api_key and api_key != "your_api_key_here")
     return {
         "status": "healthy",
         "service": "LegalEase Backend",
         "gemini_configured": gemini_configured,
+        "model_name": model_name,
     }
 
 

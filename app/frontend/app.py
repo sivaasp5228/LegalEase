@@ -178,7 +178,7 @@ with col_config:
                     response = requests.post(
                         f"{BACKEND_URL}/generate",
                         json=payload,
-                        timeout=60,
+                        timeout=120,
                     )
                     if response.status_code == 200:
                         data = response.json()
@@ -191,6 +191,11 @@ with col_config:
                     else:
                         error_detail = response.json().get("detail", response.text)
                         st.error(f"Generation failed ({response.status_code}): {error_detail}")
+                except requests.exceptions.Timeout:
+                    st.error(
+                        "Document generation timed out after 120 seconds. "
+                        "The AI model took longer than expected to respond. Please try again."
+                    )
                 except requests.exceptions.ConnectionError:
                     st.error(
                         f"Could not connect to FastAPI backend at {BACKEND_URL}. "
